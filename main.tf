@@ -113,7 +113,7 @@ resource "aws_instance" "neo4j_server" {
     # Configurar Neo4J
     sudo sed -i 's/#dbms.default_listen_address=0.0.0.0/dbms.default_listen_address=0.0.0.0/' /etc/neo4j/neo4j.conf
     sudo sed -i 's/#dbms.default_advertised_address=localhost/dbms.default_advertised_address=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)/' /etc/neo4j/neo4j.conf
-    echo "dbms.security.auth_enabled=false" | sudo tee -a /etc/neo4j/neo4j.con
+    echo "dbms.security.auth_enabled=false" | sudo tee -a /etc/neo4j/neo4j.conf
     # Iniciar Neo4J
     sudo systemctl enable neo4j
     sudo systemctl restart neo4j
