@@ -1,3 +1,5 @@
+package loader;
+
 import loader.graph.Neo4JConnection;
 import loader.graph.Neo4JLoader;
 import loader.hazelcast.HazelcastConnection;
@@ -5,8 +7,8 @@ import loader.hazelcast.HazelcastConnection;
 public class Main {
     public static void main(String[] args) {
         String neo4jUri = System.getenv("NEO4J_URI");
-        String neo4jUser = "neo4j";
-        String neo4jPassword = "password";
+        String neo4jUser = System.getenv("NEO4J_USER");
+        String neo4jPassword = System.getenv("NEO4J_PASSWORD");
         String hazelcastIp = System.getenv("HAZELCAST_IP");
 
         if (neo4jUri == null || neo4jUser == null || neo4jPassword == null) {
