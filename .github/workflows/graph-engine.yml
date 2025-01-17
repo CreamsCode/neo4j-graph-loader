@@ -41,7 +41,7 @@ jobs:
         run: |
           export HAZELCAST_IP=$(aws ssm get-parameter --name "hazelcast_ip" --query "Parameter.Value" --output text --region us-east-1)
           echo "Hazelcast Ip: $HAZELCAST_IP"
-          terraform apply -auto-approve -var="hazelcast_ip=$HAZELCAST_IP" -var="neo4j_user=root" -var="neo4j_password=admin"
+          terraform apply -auto-approve -var="hazelcast_ip=$HAZELCAST_IP"
 
 
       - name: Debug Terraform Outputs
