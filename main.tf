@@ -7,16 +7,6 @@ variable "hazelcast_ip" {
   type        = string
 }
 
-variable "neo4j_password" {
-  description = "Password for Neo4j"
-  type        = string
-}
-
-variable "neo4j_user" {
-  description = "User for Neo4j"
-  type        = string
-}
-
 # VPC
 resource "aws_vpc" "neo4j_vpc" {
   cidr_block = "10.0.0.0/16"
@@ -123,17 +113,11 @@ resource "aws_instance" "neo4j_server" {
     # Configurar Neo4J
     sudo sed -i 's/#dbms.default_listen_address=0.0.0.0/dbms.default_listen_address=0.0.0.0/' /etc/neo4j/neo4j.conf
     sudo sed -i 's/#dbms.default_advertised_address=localhost/dbms.default_advertised_address=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)/' /etc/neo4j/neo4j.conf
-
-    # Deshabilitar el flujo de cambio de contraseña inicial
-    echo "dbms.security.auth_init_enabled=false" | sudo tee -a /etc/neo4j/neo4j.conf
-
-    # Crear archivo de credenciales con usuario y contraseña predefinidos
-    sudo bash -c 'echo "neo4j:notneo4j\root:admin" > /var/lib/neo4j/data/dbms/auth'
-    sudo chown neo4j:neo4j /var/lib/neo4j/data/dbms/auth
-
+    echo "dbms.security.auth_enabled=false" | sudo tee -a /etc/neo4j/neo4j.conf
     # Iniciar Neo4J
     sudo systemctl enable neo4j
-    sudo systemctl start neo4j
+    sudo systemctl restart neo4j
+    echo "Neo4j configurado con autenticación deshabilitada."
   EOF
 
   tags = {
@@ -161,14 +145,13 @@ resource "aws_instance" "graph_loader" {
     echo "export PATH=\$M2_HOME/bin:\$PATH" | sudo tee -a /etc/profile.d/maven.sh
     source /etc/profile.d/maven.sh
 
-    # Clonar repositorio Datamart
     git clone https://github.com/CreamsCode/neo4j-graph-loader /home/ec2-user/graph-loader
     cd /home/ec2-user/graph-loader
 
     # Configuración de Variables de Entorno
     export HAZELCAST_IP="${var.hazelcast_ip}"
-    export NEO4J_USER="${var.neo4j_user}"
-    export NEO4J_PASSWORD="${var.neo4j_password}"
+    export NEO4J_USER=$"neo4j"
+    export NEO4J_PASSWORD=$"neo4j"
     export NEO4J_IP="${aws_instance.neo4j_server.public_ip}"
     export NEO4J_URI="bolt://$NEO4J_IP:7687"
 
@@ -180,8 +163,8 @@ resource "aws_instance" "graph_loader" {
     echo "NEO4J_URI: $NEO4J_URI"
 
 
-    /opt/maven/bin/mvn clean package
-    java -jar target/neo4j-loader-1.0-SNAPSHOT.jar
+    sudo /opt/maven/bin/mvn clean package
+    sudo java -jar target/neo4j-loader-1.0-SNAPSHOT.jar
 
     echo "GraphLoader instance ready."
 
@@ -191,23 +174,4 @@ resource "aws_instance" "graph_loader" {
     Name = "Graph Loader"
   }
 }
-
-resource "aws_instance" "graph_query" {
-  ami           = "ami-05576a079321f21f8"
-  instance_type = "t2.micro"
-  subnet_id     = aws_subnet.neo4j_subnet.id
-  key_name      = "vockey"
-  security_groups = [aws_security_group.neo4j_sg.id]
-  iam_instance_profile   = "EMR_EC2_DefaultRole"
-
-  user_data = <<-EOF
-    #!/bin/bash
-
-  EOF
-
-  tags = {
-    Name = "Graph Query"
-  }
-}
-
 

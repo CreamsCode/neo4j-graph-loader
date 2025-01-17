@@ -10,6 +10,3 @@ output "graph_loader_public_ip" {
   value = aws_instance.graph_loader
 }
 
-output "graph_query_public_ip" {
-  value = aws_instance.graph_query
-}
