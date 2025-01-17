@@ -165,59 +165,21 @@ resource "aws_instance" "graph_loader" {
   }
 }
 
-variable "hazelcast_ip" {
-  description = "IP of Hazelcast Server"
-  type        = string
-}
-
-resource "aws_vpc" "api_vpc" {
-  cidr_block = "10.0.0.0/16"
-  tags = {
-    Name = "apiVPC"
-  }
-}
-
-resource "aws_subnet" "api_subnet" {
-  vpc_id                  = aws_vpc.api_vpc.id
-  cidr_block              = "10.0.1.0/24"
-  map_public_ip_on_launch = true
-  availability_zone       = "us-east-1a"
-  tags = {
-    Name = "ApiSubnet"
-  }
-}
-
-resource "aws_internet_gateway" "api_igw" {
-  vpc_id = aws_vpc.api_vpc.id
-  tags = {
-    Name = "ApiInternetGateway"
-  }
-}
-
-resource "aws_route_table" "api_route_table" {
-  vpc_id = aws_vpc.api_vpc.id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.api_igw.id
-  }
-  tags = {
-    Name = "ApiRouteTable"
-  }
-}
-
-resource "aws_route_table_association" "api_subnet_association" {
-  subnet_id      = aws_subnet.api_subnet.id
-  route_table_id = aws_route_table.api_route_table.id
-}
-
 resource "aws_security_group" "api_sg" {
   name        = "api-sg"
-  vpc_id      = aws_vpc.api_vpc.id
+  vpc_id      = aws_vpc.neo4j_vpc.id
   description = "Allow traffic for API"
 
   ingress {
     from_port   = 8080
     to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -243,10 +205,10 @@ resource "aws_security_group" "api_sg" {
 }
 
 resource "aws_instance" "api_server" {
-  ami           = "ami-05576a079321f21f8" # Amazon Linux 2
+  ami           = "ami-05576a079321f21f8"
   instance_type = "t2.micro"
-  subnet_id     = aws_subnet.api_subnet.id
-  key_name      = "vockey" # Cambia por el nombre correcto de tu clave
+  subnet_id     = aws_subnet.neo4j_subnet.id
+  key_name      = "vockey"
   security_groups = [aws_security_group.api_sg.id]
   iam_instance_profile = "EMR_EC2_DefaultRole"
 
@@ -286,9 +248,4 @@ resource "aws_instance" "api_server" {
     Name = "API-Server"
   }
 }
-
-output "api_endpoint" {
-  value = "http://${aws_instance.api_server.public_ip}:8080/api"
-}
-
 
