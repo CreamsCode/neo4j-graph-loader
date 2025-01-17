@@ -163,7 +163,7 @@ resource "aws_instance" "graph_loader" {
     echo "NEO4J_URI: $NEO4J_URI"
 
 
-    /opt/maven/bin/mvn clean package
+    sudo /opt/maven/bin/mvn clean package
     sudo java -jar target/neo4j-loader-1.0-SNAPSHOT.jar
 
     echo "GraphLoader instance ready."
