@@ -15,7 +15,7 @@ public class GraphController {
     private final Neo4JConnection neo4jConnection;
 
     public GraphController() {
-        this.neo4jConnection = new Neo4JConnection("bolt://localhost:7687", "neo4j", "password");
+        this.neo4jConnection = new Neo4JConnection("bolt://localhost:7687", "neo4j", "password", true);
     }
 
     @GetMapping("/shortest-path")
