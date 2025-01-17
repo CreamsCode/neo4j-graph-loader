@@ -7,8 +7,8 @@ import com.example.hazelcast.HazelcastConnection;
 public class TestNeo4J {
     public static void main(String[] args) {
         String neo4jUri = System.getenv("NEO4J_URI");
-        String neo4jUser = System.getenv("NEO4J_USER");
-        String neo4jPassword = System.getenv("NEO4J_PASSWORD");
+        String neo4jUser = "neo4j";
+        String neo4jPassword = "password";
         String hazelcastIp = System.getenv("HAZELCAST_IP");
 
         if (neo4jUri == null || neo4jUser == null || neo4jPassword == null) {

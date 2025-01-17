@@ -1,0 +1,43 @@
+# Archivos de compilación y clases
+*.class
+
+# Archivos de logs
+*.log
+*.out
+
+# Directorio de salida de Maven
+target/
+
+# Archivos de configuración de IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# Configuración del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos temporales
+*.tmp
+*.swp
+
+# Archivos de configuración y dependencias locales
+.mvn/
+.settings/
+.classpath
+.project
+
+# Archivos sensibles (asegúrate de no subir claves o credenciales)
+*.pem
+*.key
+*.p12
+*.crt
+*.env
+
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+terraform.lock.hcl
+.terraform.lock.hcl
