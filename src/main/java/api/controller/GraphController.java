@@ -11,11 +11,18 @@ import loader.graph.Neo4JConnection;
 @RestController
 @RequestMapping("/api")
 public class GraphController {
-
     private final Neo4JConnection neo4jConnection;
 
     public GraphController() {
-        this.neo4jConnection = new Neo4JConnection("bolt://localhost:7687", "neo4j", "password", true);
+        String neo4jUri = System.getProperty("NEO4J_URI");
+        String neo4jUser = System.getProperty("NEO4J_USER");
+        String neo4jPassword = System.getProperty("NEO4J_PASSWORD");
+
+        if (neo4jUri == null || neo4jUser == null || neo4jPassword == null) {
+            throw new IllegalArgumentException("Neo4J properties (NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD) are not set.");
+        }
+
+        this.neo4jConnection = new Neo4JConnection(neo4jUri, neo4jUser, neo4jPassword, true);
     }
 
     @GetMapping("/shortest-path")
