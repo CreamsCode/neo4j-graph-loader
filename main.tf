@@ -151,7 +151,7 @@ resource "aws_instance" "graph_loader" {
     # Configuración de Variables de Entorno
     export HAZELCAST_IP="${var.hazelcast_ip}"
     export NEO4J_USER=$"neo4j"
-    export NEO4J_PASSWORD="$"neo4j"
+    export NEO4J_PASSWORD=$"neo4j"
     export NEO4J_IP="${aws_instance.neo4j_server.public_ip}"
     export NEO4J_URI="bolt://$NEO4J_IP:7687"
 
