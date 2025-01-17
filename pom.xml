@@ -6,7 +6,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>api</module>
-        <module>loader</module>
+        <module>API</module>
+        <module>Loader</module>
     </modules>
 </project>
