@@ -6,15 +6,15 @@ import loader.hazelcast.HazelcastConnection;
 
 public class Main {
     public static void main(String[] args) {
-        String neo4jUri = System.getenv("NEO4J_URI");
-        String neo4jUser = System.getenv("NEO4J_USER");
-        String neo4jPassword = System.getenv("NEO4J_PASSWORD");
-        String hazelcastIp = System.getenv("HAZELCAST_IP");
+        String neo4jUri = System.getProperty("NEO4J_URI");
+        String neo4jUser = System.getProperty("NEO4J_USER");
+        String neo4jPassword = System.getProperty("NEO4J_PASSWORD");
+        String hazelcastIp = System.getProperty("HAZELCAST_IP");
         boolean authEnabled = false;
 
-        System.out.println("NEO4J_URI: " + neo4jUri);
-        System.out.println("NEO4J_USER: " + neo4jUser);
-        System.out.println("NEO4J_PASSWORD: " + neo4jPassword);
+        //System.out.println("NEO4J_URI: " + neo4jUri);
+        //System.out.println("NEO4J_USER: " + neo4jUser);
+        //System.out.println("NEO4J_PASSWORD: " + neo4jPassword);
 
         if (neo4jUri == null || neo4jUser == null || neo4jPassword == null) {
             System.err.println("Error: Neo4J environment variables are not set.");

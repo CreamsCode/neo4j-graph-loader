@@ -164,7 +164,7 @@ resource "aws_instance" "graph_loader" {
 
 
     sudo /opt/maven/bin/mvn clean package
-    sudo java -jar target/neo4j-loader-1.0-SNAPSHOT.jar
+    sudo java -DHAZELCAST_IP=$HAZELCAST_IP -DNEO4J_USER=$NEO4J_USER -DNEO4J_PASSWORD=$NEO4J_PASSWORD -DNEO4J_URI=$NEO4J_URI -jar target/neo4j-loader-1.0-SNAPSHOT.jar
 
     echo "GraphLoader instance ready."
 
