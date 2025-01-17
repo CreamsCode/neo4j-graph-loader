@@ -39,7 +39,7 @@ public class HazelcastConnection {
                 }
 
                 try {
-                    Thread.sleep(2000); // Wait 2 seconds before retrying
+                    Thread.sleep(2000);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
                     System.err.println("Retry sleep interrupted.");

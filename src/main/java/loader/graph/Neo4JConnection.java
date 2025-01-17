@@ -13,7 +13,7 @@ public class Neo4JConnection {
         if (authEnabled) {
             this.driver = GraphDatabase.driver(uri, AuthTokens.basic(user, password));
         } else {
-            this.driver = GraphDatabase.driver(uri); // Sin autenticación
+            this.driver = GraphDatabase.driver(uri);
         }
         System.out.println("Connected to Neo4J at " + uri);
     }
