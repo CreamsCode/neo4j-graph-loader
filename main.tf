@@ -144,6 +144,8 @@ resource "aws_instance" "graph_loader" {
 
   user_data = <<-EOF
     #!/bin/bash
+    sudo yum update -y
+    sudo yum install -y git wget java-17-amazon-corretto
     # Configuración de Maven
     wget https://dlcdn.apache.org/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz
     sudo tar -xvzf apache-maven-3.9.9-bin.tar.gz -C /opt
