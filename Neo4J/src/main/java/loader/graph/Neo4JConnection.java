@@ -1,4 +1,4 @@
-package com.example.graph;
+package loader.graph;
 
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;

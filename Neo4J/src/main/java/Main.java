@@ -1,10 +1,8 @@
-package com.example;
+import loader.graph.Neo4JConnection;
+import loader.graph.Neo4JLoader;
+import loader.hazelcast.HazelcastConnection;
 
-import com.example.graph.Neo4JConnection;
-import com.example.graph.Neo4JLoader;
-import com.example.hazelcast.HazelcastConnection;
-
-public class TestNeo4J {
+public class Main {
     public static void main(String[] args) {
         String neo4jUri = System.getenv("NEO4J_URI");
         String neo4jUser = "neo4j";
