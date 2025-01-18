@@ -56,10 +56,13 @@ public class GraphController {
     public Map<String, Object> getAllPaths(@RequestParam String source, @RequestParam String target) {
         Map<String, Object> response = new HashMap<>();
         String query = """
-            MATCH path = (source:Word {word: $source})-[*]-(target:Word {word: $target})
+            MATCH path = (source:Word {word: $source})-[*..20]-(target:Word {word: $target})
+            WHERE all(n IN nodes(path) WHERE id(n) <> id(source) AND id(n) <> id(target))
             RETURN nodes(path) AS nodes, relationships(path) AS relationships, 
-                   reduce(total = 0, r IN relationships(path) | total + r.weight) AS total_weight
+                reduce(total = 0, r IN relationships(path) | total + r.weight) AS total_weight
+            LIMIT 100
         """;
+
 
         try (Session session = neo4jConnection.getSession()) {
             Result result = session.run(query, Map.of("source", source, "target", target));
@@ -119,10 +122,10 @@ public class GraphController {
     public Map<String, Object> getLongestPath(@RequestParam String source, @RequestParam String target) {
         Map<String, Object> response = new HashMap<>();
         String query = """
-            MATCH path = (source:Word {word: $source})-[:RELATED_TO*]-(target:Word {word: $target})
+            MATCH path = (source:Word {word: $source})-[:RELATED_TO*..20]-(target:Word {word: $target})
             RETURN [node IN nodes(path) | node.word] AS nodes, 
-                   [rel IN relationships(path) | rel.weight] AS weights,
-                   reduce(totalWeight = 0, r IN relationships(path) | totalWeight + r.weight) AS total_weight
+                [rel IN relationships(path) | rel.weight] AS weights,
+                reduce(totalWeight = 0, r IN relationships(path) | totalWeight + r.weight) AS total_weight
             ORDER BY total_weight DESC
             LIMIT 1
         """;
