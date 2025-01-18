@@ -123,13 +123,12 @@ public class GraphController {
     public Map<String, Object> getLongestPath(@RequestParam String source, @RequestParam String target) {
         Map<String, Object> response = new HashMap<>();
         String query = """
-            MATCH path = (source:Word {word: $source})-[:RELATED_TO*..20]-(target:Word {word: $target})
-            WHERE all(n IN nodes(path) WHERE size(filter(m IN nodes(path) WHERE m = n)) = 1)
-            RETURN [node IN nodes(path) | node.word] AS nodes, 
-                   [rel IN relationships(path) | rel.weight] AS weights,
-                   reduce(totalWeight = 0, r IN relationships(path) | totalWeight + r.weight) AS total_weight
-            ORDER BY total_weight DESC
-            LIMIT 1
+            MATCH path = (source:Word {word: $source})-[*..20]-(target:Word {word: $target})
+            WHERE all(n IN nodes(path) WHERE size([m IN nodes(path) WHERE m = n]) = 1)
+            RETURN nodes(path) AS nodes, 
+               relationships(path) AS relationships, 
+               reduce(total = 0, r IN relationships(path) | total + r.weight) AS total_weight
+            LIMIT 100
         """;
 
         try (Session session = neo4jConnection.getSession()) {
