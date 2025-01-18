@@ -114,4 +114,135 @@ public class GraphController {
 
         return response;
     }
+
+    @GetMapping("/longest-path")
+    public Map<String, Object> getLongestPath(@RequestParam String source, @RequestParam String target) {
+        Map<String, Object> response = new HashMap<>();
+        String query = """
+            MATCH path = (source:Word {word: $source})-[:RELATED_TO*]-(target:Word {word: $target})
+            RETURN [node IN nodes(path) | node.word] AS nodes, 
+                   [rel IN relationships(path) | rel.weight] AS weights,
+                   reduce(totalWeight = 0, r IN relationships(path) | totalWeight + r.weight) AS total_weight
+            ORDER BY total_weight DESC
+            LIMIT 1
+        """;
+
+        try (Session session = neo4jConnection.getSession()) {
+            Result result = session.run(query, Map.of("source", source, "target", target));
+            if (result.hasNext()) {
+                Record record = result.next();
+                response.put("nodes", record.get("nodes").asList());
+                response.put("weights", record.get("weights").asList());
+                response.put("total_weight", record.get("total_weight").asDouble());
+            } else {
+                response.put("error", "No path found between the specified nodes.");
+            }
+        } catch (Exception e) {
+            response.put("error", e.getMessage());
+        }
+
+        return response;
+    }
+
+    @GetMapping("/clusters")
+    public Map<String, Object> getClusters() {
+        Map<String, Object> response = new HashMap<>();
+        String query = """
+            MATCH (n:Word)-[:RELATED_TO*]-(m:Word)
+            WITH id(n) AS cluster_id, n.word AS root_word, collect(DISTINCT m.word) AS connected_words
+            RETURN cluster_id, [root_word] + connected_words AS cluster_nodes
+        """;
+
+        try (Session session = neo4jConnection.getSession()) {
+            Result result = session.run(query);
+
+            List<Map<String, Object>> clusters = new ArrayList<>();
+            while (result.hasNext()) {
+                Record record = result.next();
+                clusters.add(Map.of(
+                        "component_id", record.get("cluster_id").asInt(),
+                        "nodes", record.get("cluster_nodes").asList()
+                ));
+            }
+
+            if (clusters.isEmpty()) {
+                response.put("message", "No clusters found.");
+            } else {
+                response.put("clusters", clusters);
+            }
+        } catch (Exception e) {
+            response.put("error", e.getMessage());
+        }
+
+        return response;
+    }
+
+    @GetMapping("/high-degree-nodes")
+    public Map<String, Object> getHighDegreeNodes() {
+        Map<String, Object> response = new HashMap<>();
+        String query = """
+            MATCH (n:Word)-[r]-()
+            WITH n, count(r) AS degree
+            WHERE degree >= 8
+            RETURN n.word AS word, degree
+            ORDER BY degree DESC
+        """;
+
+        try (Session session = neo4jConnection.getSession()) {
+            Result result = session.run(query);
+
+            List<Map<String, Object>> nodes = new ArrayList<>();
+            while (result.hasNext()) {
+                Record record = result.next();
+                nodes.add(Map.of(
+                        "word", record.get("word").asString(),
+                        "degree", record.get("degree").asInt()
+                ));
+            }
+
+            if (nodes.isEmpty()) {
+                response.put("message", "No nodes found with high degree of connectivity.");
+            } else {
+                response.put("high_degree_nodes", nodes);
+            }
+        } catch (Exception e) {
+            response.put("error", e.getMessage());
+        }
+
+        return response;
+    }
+
+    @GetMapping("/nodes-by-degree/{degree}")
+    public Map<String, Object> getNodesByDegree(@PathVariable int degree) {
+        Map<String, Object> response = new HashMap<>();
+        String query = """
+            MATCH (n:Word)-[r]-()
+            WITH n, count(r) AS degree
+            WHERE degree = $degree
+            RETURN n.word AS word, degree
+        """;
+
+        try (Session session = neo4jConnection.getSession()) {
+            Result result = session.run(query, Map.of("degree", degree));
+
+            List<Map<String, Object>> nodes = new ArrayList<>();
+            while (result.hasNext()) {
+                Record record = result.next();
+                nodes.add(Map.of(
+                        "word", record.get("word").asString(),
+                        "degree", record.get("degree").asInt()
+                ));
+            }
+
+            if (nodes.isEmpty()) {
+                response.put("message", "No nodes found with degree " + degree + ".");
+            } else {
+                response.put("nodes", nodes);
+            }
+        } catch (Exception e) {
+            response.put("error", e.getMessage());
+        }
+
+        return response;
+    }
 }
