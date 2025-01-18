@@ -7,16 +7,22 @@ variable "hazelcast_ip" {
   type        = string
 }
 
-resource "aws_vpc" "neo4j_vpc" {
-  cidr_block = "10.0.0.0/16"
-  tags = {
-    Name = "neoVPC"
-  }
+data "aws_ssm_parameter" "vpc_id" {
+  name = "/shared/vpc/id"
 }
 
+data "aws_ssm_parameter" "igw_id" {
+  name = "/shared/vpc/igw_id"
+}
+
+data "aws_ssm_parameter" "route_table_id" {
+  name = "/shared/vpc/route_table_id"
+}
+
+
 resource "aws_subnet" "neo4j_subnet" {
-  vpc_id                  = aws_vpc.neo4j_vpc.id
-  cidr_block              = "10.0.1.0/24"
+  vpc_id                  = data.aws_ssm_parameter.vpc_id.value
+  cidr_block              = "10.0.4.0/24"
   map_public_ip_on_launch = true
   availability_zone       = "us-east-1a"
   tags = {
@@ -24,32 +30,15 @@ resource "aws_subnet" "neo4j_subnet" {
   }
 }
 
-resource "aws_internet_gateway" "neo4j_igw" {
-  vpc_id = aws_vpc.neo4j_vpc.id
-  tags = {
-    Name = "Neo4JInternetGateway"
-  }
-}
-
-resource "aws_route_table" "neo4j_route_table" {
-  vpc_id = aws_vpc.neo4j_vpc.id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.neo4j_igw.id
-  }
-  tags = {
-    Name = "Neo4JRouteTable"
-  }
-}
 
 resource "aws_route_table_association" "neo4j_subnet_association" {
   subnet_id      = aws_subnet.neo4j_subnet.id
-  route_table_id = aws_route_table.neo4j_route_table.id
+  route_table_id = data.aws_ssm_parameter.route_table_id.value
 }
 
 resource "aws_security_group" "neo4j_sg" {
   name        = "neo4j-sg"
-  vpc_id      = aws_vpc.neo4j_vpc.id
+  vpc_id      = data.aws_ssm_parameter.vpc_id.value
   description = "Allow traffic for Neo4J"
 
   ingress {
@@ -167,7 +156,7 @@ resource "aws_instance" "graph_loader" {
 
 resource "aws_security_group" "api_sg" {
   name        = "api-sg"
-  vpc_id      = aws_vpc.neo4j_vpc.id
+  vpc_id      = data.aws_ssm_parameter.vpc_id.value
   description = "Allow traffic for API"
 
   ingress {
@@ -248,4 +237,3 @@ resource "aws_instance" "api_server" {
     Name = "API-Server"
   }
 }
-
