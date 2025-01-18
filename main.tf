@@ -154,7 +154,7 @@ resource "aws_instance" "graph_loader" {
 
 
     sudo /opt/maven/bin/mvn clean install
-    sudo java -DHAZELCAST_IP=$HAZELCAST_IP -DNEO4J_USER=$NEO4J_USER -DNEO4J_PASSWORD=$NEO4J_PASSWORD -DNEO4J_URI=$NEO4J_URI -jar Loader/target/loader-1.0.jar
+    sudo java -DHAZELCAST_IP=$HAZELCAST_IP -DNEO4J_USER=$NEO4J_USER -DNEO4J_PASSWORD=$NEO4J_PASSWORD -DNEO4J_URI=$NEO4J_URI -jar Loader/target/Loader-1.0.jar
 
     echo "GraphLoader instance ready."
 
@@ -240,7 +240,7 @@ resource "aws_instance" "api_server" {
     echo "NEO4J_URI: $NEO4J_URI"
 
     sudo /opt/maven/bin/mvn clean install
-    sudo java -DNEO4J_URI=$NEO4J_URI -DNEO4J_USER=$NEO4J_USER -DNEO4J_PASSWORD=$NEO4J_PASSWORD -jar API/target/api-1.0.jar
+    sudo java -DNEO4J_URI=$NEO4J_URI -DNEO4J_USER=$NEO4J_USER -DNEO4J_PASSWORD=$NEO4J_PASSWORD -jar API/target/API-1.0.jar
     echo "API server is running..."
   EOF
 
