@@ -20,8 +20,9 @@
     <dependencies>
         <dependency>
             <groupId>edu.ulpgc.tscd</groupId>
-            <artifactId>loader</artifactId>
+            <artifactId>Loader</artifactId>
             <version>1.0</version>
+            <scope> compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
